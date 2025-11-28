@@ -1,15 +1,10 @@
-import { Controller, Inject, Config } from '@asenajs/asena/server';
-import { Post } from '@asenajs/asena/web';
-import { type Context, ConfigService, CorsMiddleware } from '@asenajs/hono-adapter';
+import { Controller, Inject } from '@asenajs/asena/server';
+import { Get, Post } from '@asenajs/asena/web';
+import { type Context } from '@asenajs/hono-adapter';
 
 import { AccountTrackerService } from '../services/AccountTrackerService';
 
 import type { AccountNames, Account } from '../types';
-
-@Config()
-export class ServerConfig extends ConfigService {
-  middlewares = [CorsMiddleware];
-}
 
 @Controller('/account')
 export class AccountTrackerController {
@@ -17,7 +12,7 @@ export class AccountTrackerController {
   private fetchAllData: (gameName: string, tag: string) => any;
 
   @Post('/')
-  public async GetAccount(context: Context) {
+  public async GetAllAccounts(context: Context) {
     const profileIconPath = `http://${context.req.header()['host']}/static/profiles/`;
 
     const accounts: AccountNames[] = await context.getBody();
@@ -28,5 +23,15 @@ export class AccountTrackerController {
       dataList.push({ ...data, profileIcon: profileIconPath + `${data.profile.profileIconId}.png` });
     }
     return context.send(dataList);
+  }
+  @Get('/:gameName/:tagLine')
+  public async GetAccount(context: Context) {
+    const profileIconPath = `http://${context.req.header()['host']}/static/profiles/`;
+
+    const gameName: string = context.getParam('gameName')
+    const tagLine: string = context.getParam('tagLine')
+
+    const data: Account = await this.fetchAllData(gameName, tagLine);
+    return context.send({...data, profileIcon: `${profileIconPath + data.profile.profileIconId}.png` });
   }
 }

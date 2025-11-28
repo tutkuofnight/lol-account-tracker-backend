@@ -4,6 +4,8 @@ import { CorsMiddleware } from '@asenajs/hono-adapter';
 @Middleware()
 export class GlobalCors extends CorsMiddleware {
   constructor() {
-    super(); // Defaults to { origin: '*' }
+    super({
+      origin: '*',
+    });
   }
 }
