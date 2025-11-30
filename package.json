@@ -4,7 +4,7 @@
   "scripts": {
     "start": "bun --hot src/index.ts",
     "build": "asena build",
-    "start:prod": "bun run dist/index.js",
+    "start:prod": "bun --hot run dist/index.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

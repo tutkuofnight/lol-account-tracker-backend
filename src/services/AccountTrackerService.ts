@@ -5,6 +5,28 @@ import request from '../lib/request';
 
 @Service()
 export class AccountTrackerService {
+  
+  public async fetchAllData(gameName: string, tag: string) {
+    const accData = await this.fetchAccountData(gameName, tag);
+    const region = await this.fetchAccountRegion(accData.puuid);
+    const [accProfile, accLeague, accActiveGame] = await Promise.all([
+      this.fetchAccountProfile(accData.puuid, region),
+      this.fetchAccountCurrentLeague(accData.puuid, region),
+      this.fetchAccountActiveGame(accData.puuid, region),
+    ]);
+
+    const account: Account = {
+      profile: {
+        ...accData,
+        ...accProfile,
+      },
+      leagues: accLeague,
+      activeGame: accActiveGame,
+      region,
+    };
+    return account;
+  }
+  
   private async fetchAccountData(gameName: string, tag: string): Promise<AccountInfo> {
     const { data }: { data: AccountInfo } = await request(
       `${baseUrl()}/riot/account/v1/accounts/by-riot-id/${gameName}/${tag}`,
@@ -45,26 +67,5 @@ export class AccountTrackerService {
       `${baseUrl(region)}/lol/league/v4/entries/by-puuid/${puuid}`,
     );
     return data;
-  }
-
-  public async fetchAllData(gameName: string, tag: string) {
-    const accData = await this.fetchAccountData(gameName, tag);
-    const region = await this.fetchAccountRegion(accData.puuid);
-    const [accProfile, accLeague, accActiveGame] = await Promise.all([
-      this.fetchAccountProfile(accData.puuid, region),
-      this.fetchAccountCurrentLeague(accData.puuid, region),
-      this.fetchAccountActiveGame(accData.puuid, region),
-    ]);
-
-    const account: Account = {
-      profile: {
-        ...accData,
-        ...accProfile,
-      },
-      leagues: accLeague,
-      activeGame: accActiveGame,
-      region,
-    };
-    return account;
   }
 }
