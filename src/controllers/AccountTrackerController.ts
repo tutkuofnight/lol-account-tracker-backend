@@ -19,7 +19,7 @@ export class AccountTrackerController {
     const tagLines: string[] = await context.getQueryAll("tagLines");
     
     if(gameNames.length != tagLines.length){
-      throw new HTTPException(500,{res: await context.send("Siktir git")})
+      throw new HTTPException(500,{res: await context.send("gameNames and tagLines not matched")})
     }
     
     const accounts : AccountNames[]=[];
