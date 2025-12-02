@@ -18,14 +18,21 @@ export class AccountTrackerController {
     const gameNames: string[] = await context.getQueryAll("gameNames");
     const tagLines: string[] = await context.getQueryAll("tagLines");
     
-    if(gameNames.length != tagLines.length){
-      throw new HTTPException(500,{res: await context.send("gameNames and tagLines not matched")})
+    const gn: string[] = gameNames.join("").split(",")
+    const tg: string[] = tagLines.join("").split(",")
+    
+    console.log(gameNames, tagLines)
+
+    
+    
+    if(gn.length != tg.length){
+      throw new HTTPException(500,{res: await context.send("gameNames and tagLines not matched.")})
     }
     
     const accounts : AccountNames[]=[];
     
-    for(let i = 0; i < gameNames.length; i++){
-      accounts.push({gameName:gameNames[i],tagLine:tagLines[i]});
+    for(let i = 0; i < gn.length; i++){
+      accounts.push({ gameName:gn[i], tagLine:tg[i] });
     }
     
     let dataList: Account[] = [];
@@ -34,16 +41,5 @@ export class AccountTrackerController {
       dataList.push({ ...data, profileIcon: profileIconPath + `${data.profile.profileIconId}.png` });
     }
     return context.send(dataList);
-  }
-  
-  @Get('/:gameName/:tagLine')
-  public async getAccount(context: Context) {
-    const profileIconPath = `http://${context.req.header()['host']}/static/profiles/`;
-
-    const gameName: string = context.getParam('gameName')
-    const tagLine: string = context.getParam('tagLine')
-
-    const data: Account = await this.fetchAllData(gameName, tagLine);
-    return context.send({...data, profileIcon: `${profileIconPath + data.profile.profileIconId}.png` });
   }
 }

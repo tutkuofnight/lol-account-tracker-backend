@@ -41,7 +41,7 @@ export class AccountTrackerService {
     return data.region;
   }
 
-  private async fetchAccountProfile(puuid: string, region): Promise<AccountProfile> {
+  private async fetchAccountProfile(puuid: string, region: string): Promise<AccountProfile> {
     const { data }: { data: AccountProfile } = await request(
       `${baseUrl(region)}/lol/summoner/v4/summoners/by-puuid/${puuid}`,
     );
